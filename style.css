@@ -11,20 +11,21 @@ body {
 }
 
 #player {
-  width: 80px; /* Adjust width and height as per your image */
-  height: 80px;
+  /* Adjust the dimensions and position as needed */
+  width: 80px;
+  height: 120px;
   position: absolute;
   bottom: 0;
-  left: 50px;
+  left: 10%;
+  transform: translateX(-50%);
 }
 
 #obstacle {
-  width: 30px;
-  height: 30px;
+  width: 80px;
+  height: 80px;
   position: absolute;
   bottom: 0;
-  right: 50px;
-  background: url("./obstacle.png") no-repeat center center;
+  right: 10%;
 }
 
 #score {

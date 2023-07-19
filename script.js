@@ -1,15 +1,119 @@
-let gameRunning = true;
-let score = 0;
+// const player = document.getElementById("player");
+// const gameContainer = document.getElementById("game-container");
+// const scoreDisplay = document.getElementById("score");
+
+// let gameRunning = true;
+// let score = 0;
+// let playerJumping = false;
+
+// function jump() {
+//   if (!playerJumping) {
+//     playerJumping = true;
+//     let jumpCount = 0;
+//     const jumpInterval = setInterval(() => {
+//       player.style.bottom = 50 - 5 * jumpCount + "px";
+//       jumpCount++;
+//       if (jumpCount >= 11) {
+//         clearInterval(jumpInterval);
+//         let fallCount = 0;
+//         const fallInterval = setInterval(() => {
+//           player.style.bottom = 5 * fallCount + "px";
+//           fallCount++;
+//           if (fallCount >= 11) {
+//             clearInterval(fallInterval);
+//             playerJumping = false;
+//           }
+//         }, 20);
+//       }
+//     }, 20);
+//   }
+// }
+
+// document.addEventListener("keydown", (event) => {
+//   if (event.code === "Space" || event.code === "Spacebar") {
+//     jump();
+//   }
+// });
+
+// function updateScore() {
+//   score++;
+//   scoreDisplay.innerText = `Score: ${score}`;
+// }
+
+// function checkCollision() {
+//   const obstacles = document.getElementsByClassName("obstacle");
+//   for (let i = 0; i < obstacles.length; i++) {
+//     const obstacle = obstacles[i];
+//     const obstaclePosition = parseInt(obstacle.style.right);
+
+//     if (
+//       obstaclePosition >= 50 &&
+//       obstaclePosition <= 100 &&
+//       player.style.bottom === "0px"
+//     ) {
+//       gameRunning = false;
+//       alert("Game Over! Your final score: " + score);
+//     }
+//   }
+// }
+
+// function gameLoop() {
+//   if (!gameRunning) return;
+
+//   const obstacles = document.getElementsByClassName("obstacle");
+//   const containerWidth = gameContainer.offsetWidth;
+
+//   for (let i = 0; i < obstacles.length; i++) {
+//     const obstacle = obstacles[i];
+//     const obstaclePosition = parseInt(obstacle.style.right);
+//     if (obstaclePosition < -30) {
+//       obstacle.remove();
+//     }
+
+//     obstacle.style.right = obstaclePosition - 5 + "px";
+//   }
+
+//   if (Math.random() < 0.02) {
+//     const newObstacle = document.createElement("div");
+//     newObstacle.className = "obstacle";
+//     gameContainer.appendChild(newObstacle);
+//   }
+
+//   checkCollision();
+//   requestAnimationFrame(gameLoop);
+// }
+
+// jump();
+// gameLoop();
+
 const player = document.getElementById("player");
-const obstacle = document.getElementById("obstacle");
+const gameContainer = document.getElementById("game-container");
 const scoreDisplay = document.getElementById("score");
 
+let gameRunning = true;
+let score = 0;
+let playerJumping = false;
+
 function jump() {
-  if (player.classList != "jump") {
-    player.classList.add("jump");
-    setTimeout(() => {
-      player.classList.remove("jump");
-    }, 500);
+  if (!playerJumping) {
+    playerJumping = true;
+    let jumpCount = 0;
+    const jumpInterval = setInterval(() => {
+      player.style.bottom = 50 - 5 * jumpCount + "px";
+      jumpCount++;
+      if (jumpCount >= 11) {
+        clearInterval(jumpInterval);
+        let fallCount = 0;
+        const fallInterval = setInterval(() => {
+          player.style.bottom = 5 * fallCount + "px";
+          fallCount++;
+          if (fallCount >= 11) {
+            clearInterval(fallInterval);
+            playerJumping = false;
+          }
+        }, 20);
+      }
+    }, 20);
   }
 }
 
@@ -19,43 +123,59 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+document.addEventListener("click", () => {
+  jump();
+});
+
 function updateScore() {
   score++;
   scoreDisplay.innerText = `Score: ${score}`;
 }
 
-function gameLoop() {
-  if (!gameRunning) return;
+function checkCollision() {
+  const playerRect = player.getBoundingClientRect();
+  const obstacles = document.getElementsByClassName("obstacle");
+  for (let i = 0; i < obstacles.length; i++) {
+    const obstacle = obstacles[i];
+    const obstacleRect = obstacle.getBoundingClientRect();
 
-  const obstaclePosition = parseInt(
-    window.getComputedStyle(obstacle).getPropertyValue("right")
-  );
-  const playerLeft = parseInt(
-    window.getComputedStyle(player).getPropertyValue("left")
-  );
-  const playerBottom = parseInt(
-    window.getComputedStyle(player).getPropertyValue("bottom")
-  );
-
-  if (
-    obstaclePosition > 0 &&
-    obstaclePosition < 60 &&
-    playerBottom < 60 &&
-    playerLeft > 0 &&
-    playerLeft < 60
-  ) {
-    gameRunning = false;
-    alert("Game Over! Your final score: " + score);
+    if (
+      obstacleRect.left <= playerRect.right &&
+      obstacleRect.right >= playerRect.left &&
+      player.style.bottom === "0px"
+    ) {
+      gameRunning = false;
+      alert("Game Over! Your final score: " + score);
+    }
   }
-
-  if (obstaclePosition < -20) {
-    obstacle.style.right = Math.floor(Math.random() * 400) + "px";
-    updateScore();
-  }
-
-  obstacle.style.right = obstaclePosition - 5 + "px";
-  requestAnimationFrame(gameLoop);
 }
 
-jump(); // To call jump once at the beginning.
-gameLoop();
+function moveObstacles() {
+  if (!gameRunning) return;
+
+  const obstacles = document.getElementsByClassName("obstacle");
+  const containerWidth = gameContainer.offsetWidth;
+
+  for (let i = 0; i < obstacles.length; i++) {
+    const obstacle = obstacles[i];
+    const obstaclePosition = parseInt(obstacle.style.right);
+
+    if (obstaclePosition <= 0) {
+      obstacle.remove();
+    } else {
+      obstacle.style.right = obstaclePosition - 5 + "px";
+    }
+  }
+
+  if (Math.random() < 0.02) {
+    const newObstacle = document.createElement("div");
+    newObstacle.className = "obstacle";
+    gameContainer.appendChild(newObstacle);
+  }
+
+  checkCollision();
+  updateScore();
+  requestAnimationFrame(moveObstacles);
+}
+
+moveObstacles();
